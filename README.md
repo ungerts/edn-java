@@ -2,15 +2,34 @@
 
 *edn-java* is a library to parse (read) and print (write) [edn](https://github.com/edn-format/edn).
 
+**Note:** This library is a fork of [bpsm/edn-java](https://github.com/bpsm/edn-java), adapted for use with recent Java versions and primarily focused on integration with JabRef. There is also experimental support for GitHub workflows.
+
+**Status:** This library is still in an experimental state. Use with caution in production environments.
+
+**Key changes in this fork:**
+
+* Requires Java 21 and uses Java 21 syntax
+* Experimental support for the java.time package
+* Removed ThreadLocal usage to support virtual threads (pretty printing temporarily removed)
+* Added module-info.java for Java modules
+* Experimental support for Jspecify
+* Still distributed under the Eclipse Public License 1.0
+
+**TODOs:**
+
+* Stabilize experimental features
+* Improve test coverage
+* Improve interoperability testing with EDN implementations like Clojure, etc.
+
 ## Installation
 
 This is a Maven project with the following coordinates:
 
 ```xml
 <dependency>
-    <groupId>us.bpsm</groupId>
+    <groupId>org.jabref</groupId>
     <artifactId>edn-java</artifactId>
-    <version>0.7.1</version>
+    <version>0.8.0</version>
 </dependency>
 ```
 
@@ -20,7 +39,7 @@ It is available through the OSS Sonatype Releases repository:
 
 or the Gradle coordinates:
 ```groovy
-compile 'us.bpsm:edn-java:0.7.1'
+compile 'org.jabref:edn-java:0.8.0'
 ```
 ## Parsing
 
@@ -28,17 +47,17 @@ You'll need to create a Parser and supply it with some input. Factory methods to
 
 
 ```java
-package us.bpsm.edn.examples;
+package org.jabref.edn.examples;
 
 import static org.junit.Assert.assertEquals;
-import static us.bpsm.edn.Keyword.newKeyword;
-import static us.bpsm.edn.parser.Parsers.defaultConfiguration;
+import static org.jabref.edn.Keyword.newKeyword;
+import static org.jabref.edn.parser.Parsers.defaultConfiguration;
 import java.io.IOException;
 import java.util.Map;
 import org.junit.Test;
-import us.bpsm.edn.parser.Parseable;
-import us.bpsm.edn.parser.Parser;
-import us.bpsm.edn.parser.Parsers;
+import org.jabref.edn.parser.Parseable;
+import org.jabref.edn.parser.Parser;
+import org.jabref.edn.parser.Parsers;
 
 public class ParseASingleMapTest {
     @Test
@@ -55,7 +74,7 @@ public class ParseASingleMapTest {
 
 ### Mapping from EDN to Java
 
-Most *edn* values map to regular Java types, except in such cases where Java doesn't provide something suitable. Implementations of the types peculiar to edn are provided by the package `us.bpsm.edn`.
+Most *edn* values map to regular Java types, except in such cases where Java doesn't provide something suitable. Implementations of the types peculiar to edn are provided by the package `org.jabref.edn`.
 
 `Symbol` and `Keyword` have an optional `prefix` and a mandatory `name`. Both implement the interface `Named`.
 
@@ -76,40 +95,37 @@ The parser is provided a configuration when created:
 The parser can be customized to use different collection classes by first building the appropriate `Parser.Config`:
 
 ```java
-package us.bpsm.edn.examples;
+package org.jabref.edn.examples;
 
 import static org.junit.Assert.assertEquals;
-import static us.bpsm.edn.parser.Parsers.newParseable;
+import static org.jabref.edn.parser.Parsers.newParseable;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.SortedSet;
 import java.util.TreeSet;
 import org.junit.Test;
-import us.bpsm.edn.parser.CollectionBuilder;
-import us.bpsm.edn.parser.Parseable;
-import us.bpsm.edn.parser.Parser;
-import us.bpsm.edn.parser.Parsers;
+import org.jabref.edn.parser.CollectionBuilder;
+import org.jabref.edn.parser.Parseable;
+import org.jabref.edn.parser.Parser;
+import org.jabref.edn.parser.Parsers;
 
 public class SimpleParserConfigTest {
     @Test
     public void test() throws IOException {
         Parser.Config cfg =
-            Parsers.newParserConfigBuilder().setSetFactory(
-                    new CollectionBuilder.Factory() {
-                public CollectionBuilder builder() {
-                    return new CollectionBuilder() {
-                        SortedSet<Object> s = new TreeSet<Object>();
-                        public void add(Object o) {
-                            if (!s.add(o)) {
-                                throw new EdnSyntaxException(
-                                  "Set contains duplicate element '" + o + "'."
-                                );
-                            }
-                        }
-                        public Object build() { return s; }
-                    };
+            Parsers.newParserConfigBuilder().setSetFactory(() -> new CollectionBuilder() {
+              SortedSet<Object> s = new TreeSet<>();
+
+              public void add(Object o) {
+                if (!s.add(o)) {
+                  throw new EdnSyntaxException("Set contains duplicate element '" + o + "'.");
                 }
+              }
+
+              public Object build() {
+                return s;
+              }
             }).build();
         Parseable pbr = newParseable("#{1 0 2 9 3 8 4 7 5 6}");
         Parser p = Parsers.newParser(cfg);
@@ -124,11 +140,11 @@ public class SimpleParserConfigTest {
 
 ### Tagged Values
 
-By default, handlers are provided automatically for `#inst` and `#uuid`, which return a `java.util.Date` and a `java.util.UUID` respectively. Tagged values with an unrecognized tag are mapped to `us.bpsm.edn.TaggedValue`.
+By default, handlers are provided automatically for `#inst` and `#uuid`, which return a `java.util.Date` and a `java.util.UUID` respectively. Tagged values with an unrecognized tag are mapped to `org.jabref.edn.TaggedValue`.
 
 #### Customizing the parsing of instants
 
-The package `us.bpsm.edn.parser` makes three handlers for `#inst` available:
+The package `org.jabref.edn.parser` makes three handlers for `#inst` available:
 
  - `InstantToDate` is the default and converts each `#inst` to a `java.util.Date`.
  - `InstantToCalendar` converts each `#inst` to a `java.util.Calendar`, which preserves the original GTM offset.
@@ -141,33 +157,29 @@ Extend `AbstractInstantHandler` to provide your own implementation of `#inst`.
 Use custom handlers may by building an appropriate `Parser.Config`:
 
 ```java
-package us.bpsm.edn.examples;
+package org.jabref.edn.examples;
 
 import static org.junit.Assert.assertEquals;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import org.junit.Test;
-import us.bpsm.edn.Tag;
-import us.bpsm.edn.parser.Parseable;
-import us.bpsm.edn.parser.Parser;
-import us.bpsm.edn.parser.Parsers;
-import us.bpsm.edn.parser.TagHandler;
+import org.jabref.edn.Tag;
+import org.jabref.edn.parser.Parseable;
+import org.jabref.edn.parser.Parser;
+import org.jabref.edn.parser.Parsers;
+import org.jabref.edn.parser.TagHandler;
 
 public class CustomTagHandler {
     @Test
     public void test() throws IOException, URISyntaxException {
         Parser.Config cfg =
             Parsers.newParserConfigBuilder()
-            .putTagHandler(Tag.newTag("us.bpsm", "uri"),
-                new TagHandler() {
-                public Object transform(Tag tag, Object value) {
-                    return URI.create((String) value);
-                }
-            }).build();
+            .putTagHandler(Tag.newTag("org.jabref", "uri"), (tag, value) -> 
+                URI.create((String) value)).build();
         Parser p = Parsers.newParser(cfg);
         Parseable pbr = Parsers.newParseable(
-            "#us.bpsm/uri \"http://example.com\"");
+            "#org.jabref/uri \"http://example.com\"");
         assertEquals(new URI("http://example.com"), p.nextValue(pbr));
     }
 }
@@ -178,32 +190,30 @@ public class CustomTagHandler {
 By default, integers not marked as arbitrary precision by the suffix "N" will parse as `java.lang.Long`. This can be influenced by installing handlers for the tag named by the constant `Parser.Config.LONG_TAG`.
 
 ```java
-package us.bpsm.edn.examples;
+package org.jabref.edn.examples;
 
 import static org.junit.Assert.assertEquals;
 import java.io.IOException;
 import java.math.BigInteger;
 import org.junit.Test;
-import us.bpsm.edn.Tag;
-import us.bpsm.edn.parser.Parseable;
-import us.bpsm.edn.parser.Parser;
-import us.bpsm.edn.parser.Parsers;
-import us.bpsm.edn.parser.TagHandler;
+import org.jabref.edn.Tag;
+import org.jabref.edn.parser.Parseable;
+import org.jabref.edn.parser.Parser;
+import org.jabref.edn.parser.Parsers;
+import org.jabref.edn.parser.TagHandler;
 
 public class CustomLongHandler {
     @Test
     public void test() throws IOException {
         Parser.Config cfg =
             Parsers.newParserConfigBuilder()
-                .putTagHandler(Parser.Config.LONG_TAG, new TagHandler() {
-                    public Object transform(Tag tag, Object value) {
-                        long n = (Long) value;
-                        if (Integer.MIN_VALUE <= n && n <= Integer.MAX_VALUE) {
-                            return Integer.valueOf((int) n);
-                        } else {
-                            return BigInteger.valueOf(n);
-                        }
-                    }
+                .putTagHandler(Parser.Config.LONG_TAG, (tag, value) -> {
+                  long n = (Long) value;
+                  if (Integer.MIN_VALUE <= n && n <= Integer.MAX_VALUE) {
+                    return (int) n;
+                  } else {
+                    return BigInteger.valueOf(n);
+                  }
                 }).build();
         Parser p = Parsers.newParser(cfg);
         Parseable pbr = Parsers.newParseable("1024, 2147483648");
@@ -217,11 +227,11 @@ public class CustomLongHandler {
 
 ## Printing
 
-The package `us.bpsm.edn.printer` provides an extensible printer for converting java data structures to valid *edn* text. The default configuration can print values of the following types, as well as Java's `null`, which prints as `nil`:
+The package `org.jabref.edn.printer` provides an extensible printer for converting java data structures to valid *edn* text. The default configuration can print values of the following types, as well as Java's `null`, which prints as `nil`:
 
- - `us.bpsm.edn.Keyword`
- - `us.bpsm.edn.Symbol`
- - `us.bpsm.edn.TaggedValue`
+ - `org.jabref.edn.Keyword`
+ - `org.jabref.edn.Symbol`
+ - `org.jabref.edn.TaggedValue`
  - `java.lang.Boolean`
  - `java.lang.Byte`
  - `java.lang.CharSequence`, which includes `java.lang.String`.
@@ -245,17 +255,17 @@ The `Printer` writes *characters* to the underlying `Writer`. To serialize this 
 
 ### Formatting
 
-The default Printer renders values as compactly as possible, which is beneficial when edn is used for communication. The pretty printer renders values for readability, which is beneficial for debugging and storage in version control.
+The default Printer renders values as compactly as possible, which is beneficial when edn is used for communication. // pretty printing is no longer supported
 
 ```java
-package us.bpsm.edn.examples;
+package org.jabref.edn.examples;
 
 import org.hamcrest.CoreMatchers;
 import org.junit.Assert;
 import org.junit.Test;
-import us.bpsm.edn.parser.Parser;
-import us.bpsm.edn.parser.Parsers;
-import us.bpsm.edn.printer.Printers;
+import org.jabref.edn.parser.Parser;
+import org.jabref.edn.parser.Parsers;
+import org.jabref.edn.printer.Printers;
 
 import java.util.Arrays;
 import java.util.List;
@@ -322,21 +332,21 @@ To support additional types, you'll need to provide a `Protocol<Printer.Fn<?>>` 
 As an example, we'll add printing support for URIs:
 
 ```java
-package us.bpsm.edn.examples;
+package org.jabref.edn.examples;
 
 import static org.junit.Assert.assertEquals;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.net.URI;
 import org.junit.Test;
-import us.bpsm.edn.Tag;
-import us.bpsm.edn.printer.Printer;
-import us.bpsm.edn.printer.Printer.Fn;
-import us.bpsm.edn.printer.Printers;
-import us.bpsm.edn.protocols.Protocol;
+import org.jabref.edn.Tag;
+import org.jabref.edn.printer.Printer;
+import org.jabref.edn.printer.Printer.Fn;
+import org.jabref.edn.printer.Printers;
+import org.jabref.edn.protocols.Protocol;
 
 public class CustomTagPrinter {
-    private static final Tag BPSM_URI = Tag.newTag("us.bpsm", "uri");
+    private static final Tag BPSM_URI = Tag.newTag("org.jabref", "uri");
     @Test
     public void test() throws IOException {
         Protocol<Fn<?>> fns = Printers.defaultProtocolBuilder()
@@ -350,7 +360,7 @@ public class CustomTagPrinter {
         Printer p = Printers.newPrinter(fns, w);
         p.printValue(URI.create("http://example.com"));
         p.close();
-        assertEquals("#us.bpsm/uri\"http://example.com\"", w.toString());
+        assertEquals("#org.jabref/uri\"http://example.com\"", w.toString());
     }
 }
 ```
