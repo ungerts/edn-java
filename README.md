@@ -31,7 +31,7 @@ This is a Maven project with the following coordinates:
 <dependency>
     <groupId>org.jabref</groupId>
     <artifactId>edn-java</artifactId>
-    <version>0.8.0</version>
+    <version>0.8.2</version>
 </dependency>
 ```
 
@@ -41,7 +41,7 @@ It is available through the OSS Sonatype Releases repository:
 
 or the Gradle coordinates:
 ```groovy
-compile 'org.jabref:edn-java:0.8.0'
+compile 'org.jabref:edn-java:0.8.2'
 ```
 ## Parsing
 
