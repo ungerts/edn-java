@@ -22,6 +22,7 @@
 * Stabilize experimental features
 * Improve test coverage
 * Improve interoperability testing with EDN implementations like Clojure, etc.
+* Improve softspace handling in the Printer implementation
 
 ## Installation
 
