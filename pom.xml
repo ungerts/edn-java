@@ -31,9 +31,9 @@
     </license>
   </licenses>
   <scm>
-    <url>https://github.com/bpsm/edn-java</url>
-    <connection>scm:git:git://github.com/bpsm/edn-java.git</connection>
-    <developerConnection>scm:git:git@github.com:bpsm/edn-java.git</developerConnection>
+    <url>https://github.com/ungerts/edn-java</url>
+    <connection>scm:git:git://github.com/ungerts/edn-java.git</connection>
+    <developerConnection>scm:git:git@github.com:ungerts/edn-java.git</developerConnection>
   </scm>
   <dependencies>
     <dependency>

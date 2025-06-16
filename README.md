@@ -1,5 +1,7 @@
 # edn-java
 
+![Build Status](https://github.com/ungerts/edn-java/actions/workflows/ci.yml/badge.svg?branch=main)
+
 *edn-java* is a library to parse (read) and print (write) [edn](https://github.com/edn-format/edn).
 
 **Note:** This library is a fork of [bpsm/edn-java](https://github.com/bpsm/edn-java), adapted for use with recent Java versions and primarily focused on integration with JabRef. There is also experimental support for GitHub workflows.
