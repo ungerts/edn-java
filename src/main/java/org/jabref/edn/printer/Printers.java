@@ -317,7 +317,13 @@ public class Printers {
     static final Printer.Fn<List<?>> LIST_PRINTER = (self, writer) -> {
       boolean vec = self instanceof RandomAccess;
       writer.append(vec ? '[' : '(');
+      boolean first = true;
       for (Object o : self) {
+        if (!first) {
+          writer.softspace();
+        } else {
+          first = false;
+        }
         writer.printValue(o);
       }
       writer.append(vec ? ']' : ')');
@@ -326,7 +332,13 @@ public class Printers {
     static final Printer.Fn<Set<?>> SET_PRINTER = (self, writer) -> {
       writer.softspace();
       writer.append("#{");
+      boolean first = true;
       for (Object o : self) {
+        if (!first) {
+          writer.softspace();
+        } else {
+          first = false;
+        }
         writer.printValue(o);
       }
       writer.append('}');
@@ -334,7 +346,13 @@ public class Printers {
 
     static final Printer.Fn<Map<?, ?>> MAP_PRINTER = (self, writer) -> {
       writer.append('{');
+      boolean first = true;
       for (Map.Entry<?, ?> p : self.entrySet()) {
+        if (!first) {
+          writer.softspace();
+        } else {
+          first = false;
+        }
         writer.printValue(p.getKey()).printValue(p.getValue());
       }
       writer.append('}');
