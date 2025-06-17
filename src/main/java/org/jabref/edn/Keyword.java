@@ -34,12 +34,12 @@ public final class Keyword implements Named, Comparable<Keyword>, Serializable {
     private final Symbol sym;
 
     /** {@inheritDoc} */
-    public final String getPrefix() {
+    public String getPrefix() {
         return sym.getPrefix();
     }
 
     /** {@inheritDoc} */
-    public final String getName() {
+    public String getName() {
         return sym.getName();
     }
 

@@ -75,16 +75,12 @@ class ScannerImpl implements Scanner {
         int curr = pbr.read();
       return switch (curr) {
         case END -> Token.END_OF_INPUT;
-        case 'a', 'b', 'c', 'd', 'e' -> readSymbol(curr, pbr);
+        case 'a', 'b', 'c', 'd', 'e', '.', 'u', 'v', 'w', 'x', 'y', 'z', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I',
+             'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', '*', '!', '_', '?',
+             '/', '$', '%', '&', '>', '<', '=', 'o', 'p', 'q', 'r', 's', 'g', 'h', 'i', 'j', 'k', 'l', 'm' -> readSymbol(curr, pbr);
         case 'f' -> readSymbolOrFalse(curr, pbr);
-        case 'g', 'h', 'i', 'j', 'k', 'l', 'm' -> readSymbol(curr, pbr);
         case 'n' -> readSymbolOrNil(curr, pbr);
-        case 'o', 'p', 'q', 'r', 's' -> readSymbol(curr, pbr);
         case 't' -> readSymbolOrTrue(curr, pbr);
-        case 'u', 'v', 'w', 'x', 'y', 'z', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O',
-             'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', '*', '!', '_', '?', '/', '$', '%', '&', '>', '<',
-             '=' -> readSymbol(curr, pbr);
-        case '.' -> readSymbol(curr, pbr);
         case '+', '-' -> readSymbolOrNumber(curr, pbr);
         case ':' -> readKeyword(pbr);
         case '0', '1', '2', '3', '4', '5', '6', '7', '8', '9' -> readNumber(curr, pbr);
@@ -182,8 +178,7 @@ class ScannerImpl implements Scanner {
     private char readCharacterLiteral(Parseable pbr) throws IOException {
         int curr = pbr.read();
         if (curr == END) {
-            throw new EdnSyntaxException(
-                    "Unexpected end of input following '\'");
+            throw new EdnSyntaxException("Unexpected end of input following ''");
         } else if (isWhitespace((char)curr) && curr != ',') {
             throw new EdnSyntaxException(
                     "A backslash introducing character literal must not be "+

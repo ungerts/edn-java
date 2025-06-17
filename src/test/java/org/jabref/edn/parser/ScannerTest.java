@@ -10,11 +10,9 @@ package org.jabref.edn.parser;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertSame;
-import static org.junit.Assert.assertTrue;
 import static org.jabref.edn.Keyword.newKeyword;
 import static org.jabref.edn.Symbol.newSymbol;
 
-import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import org.junit.Test;
@@ -23,10 +21,6 @@ import org.jabref.edn.EdnException;
 import org.jabref.edn.EdnSyntaxException;
 import org.jabref.edn.Keyword;
 import org.jabref.edn.Symbol;
-import org.jabref.edn.parser.Parseable;
-import org.jabref.edn.parser.Parsers;
-import org.jabref.edn.parser.ScannerImpl;
-import org.jabref.edn.parser.Token;
 
 
 public class ScannerTest {
@@ -310,8 +304,8 @@ public class ScannerTest {
 
     @Test
     public void simpleStringEscapes() {
-        assertEquals("\t\n\r\f\"\'\b\\",
-            scan("\"\\t\\n\\r\\f\\\"\\\'\\b\\\\\""));
+        assertEquals("\t\n\r\f\"'\b\\",
+            scan("\"\\t\\n\\r\\f\\\"\\'\\b\\\\\""));
     }
 
     @Test
@@ -345,7 +339,7 @@ public class ScannerTest {
     }
 
     @Test
-    public void sequenceOfTokens() throws IOException {
+    public void sequenceOfTokens() {
         String txt = """
             ; comment
             \t

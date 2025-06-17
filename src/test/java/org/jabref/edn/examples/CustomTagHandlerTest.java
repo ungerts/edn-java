@@ -9,7 +9,6 @@ package org.jabref.edn.examples;
 
 import static org.junit.Assert.assertEquals;
 
-import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 
@@ -19,12 +18,10 @@ import org.jabref.edn.Tag;
 import org.jabref.edn.parser.Parseable;
 import org.jabref.edn.parser.Parser;
 import org.jabref.edn.parser.Parsers;
-import org.jabref.edn.parser.TagHandler;
 
-
-public class CustomTagHandler {
+public class CustomTagHandlerTest {
     @Test
-    public void test() throws IOException, URISyntaxException {
+    public void test() throws URISyntaxException {
         Parser.Config cfg =
             Parsers.newParserConfigBuilder()
             .putTagHandler(Tag.newTag("org.jabref", "uri"), (tag, value) -> URI.create((String) value)).build();

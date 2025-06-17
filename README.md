@@ -353,11 +353,8 @@ public class CustomTagPrinter {
     @Test
     public void test() throws IOException {
         Protocol<Fn<?>> fns = Printers.defaultProtocolBuilder()
-                .put(URI.class, new Printer.Fn<URI>() {
-                    @Override
-                    public void eval(URI self, Printer writer) {
-                        writer.printValue(BPSM_URI).printValue(self.toString());
-                    }})
+                .put(URI.class, (Fn<URI>) (self, writer) -> 
+                    writer.printValue(BPSM_URI).printValue(self.toString()))
                     .build();
         StringWriter w = new StringWriter();
         Printer p = Printers.newPrinter(fns, w);

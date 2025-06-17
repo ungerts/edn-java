@@ -359,7 +359,7 @@ public class EdnFormatTest {
 
     @Test public void lists() {
         assertEquals(Collections.emptyList(), parse("()"));
-        assertEquals(Arrays.asList(1L), parse("(1)"));
+        assertEquals(List.of(1L), parse("(1)"));
         assertEquals(Arrays.asList(Symbol.newSymbol("foo", "bar"),
           Keyword.newKeyword("baz", "flux")), parse("(foo/bar :baz/flux)"));
     }
@@ -374,7 +374,7 @@ public class EdnFormatTest {
 
     @Test public void vectors() {
         assertEquals(Collections.emptyList(), parse("[]"));
-        assertEquals(Arrays.asList(1L), parse("[1]"));
+        assertEquals(List.of(1L), parse("[1]"));
         assertEquals(Arrays.asList(Symbol.newSymbol("foo", "bar"),
           Keyword.newKeyword("baz", "flux")), parse("[foo/bar :baz/flux]"));
     }

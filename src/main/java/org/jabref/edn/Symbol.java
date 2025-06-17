@@ -26,14 +26,14 @@ public final class Symbol implements Named, Comparable<Symbol>, Serializable {
     /**
      * {@inheritDoc}
      */
-    public final String getPrefix() {
+    public String getPrefix() {
         return prefix;
     }
 
     /**
      * {@inheritDoc}
      */
-    public final String getName() {
+    public String getName() {
         return name;
     }
 
@@ -71,7 +71,7 @@ public final class Symbol implements Named, Comparable<Symbol>, Serializable {
     }
 
     @Override
-    public final int hashCode() {
+    public int hashCode() {
         final int prime = 31;
         int result = 1;
         result = prime * result + getClass().getName().hashCode();
@@ -81,7 +81,7 @@ public final class Symbol implements Named, Comparable<Symbol>, Serializable {
     }
 
     @Override
-    public final boolean equals(Object obj) {
+    public boolean equals(Object obj) {
         if (this == obj) {
             return true;
         }

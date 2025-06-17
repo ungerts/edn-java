@@ -10,7 +10,6 @@ package org.jabref.edn.examples;
 import static org.junit.Assert.assertEquals;
 import static org.jabref.edn.parser.Parsers.newParseable;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.SortedSet;
@@ -27,10 +26,10 @@ import org.jabref.edn.parser.Parsers;
 
 public class SimpleParserConfigTest {
     @Test
-    public void test() throws IOException {
+    public void test() {
         Parser.Config cfg =
             Parsers.newParserConfigBuilder().setSetFactory(() -> new CollectionBuilder() {
-                SortedSet<Object> s = new TreeSet<>();
+                final SortedSet<Object> s = new TreeSet<>();
                 public void add(Object o) {
                     if (!s.add(o)) {
                         throw new EdnSyntaxException(
